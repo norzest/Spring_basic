@@ -1,30 +1,25 @@
 package hello.hellospring.service;
 
 import hello.hellospring.domain.Member;
-import hello.hellospring.repository.MemoryMemberRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import hello.hellospring.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// 단위테스트 ( 좋은 테스트일 확률이 높음)
-class MemberServiceTest {
+// 통합 테스트
+// 컨테이너까지 불러와 함께 테스트 ( 오래 걸림 )
+@SpringBootTest
+@Transactional
+class MemberServiceIntegrationTest {
+
+    @Autowired
     MemberService memberService;
-    MemoryMemberRepository memberRepository;
-
-    // 동작하기 전 실행
-    @BeforeEach
-    public void beforeEach() { // DI
-        memberRepository = new MemoryMemberRepository();
-        memberService = new MemberService(memberRepository);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        memberRepository.clearStore();
-    }
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     void 회원가입() {
@@ -50,18 +45,11 @@ class MemberServiceTest {
 
         //when
         memberService.join(member1);
-        // join(member2) 하면 exception이 터져야 함 그러면 테스트 성공
+        // join(member2) 하면 exception 이 터져야 함 그러면 테스트 성공
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> memberService.join(member2));
         assertThat(e.getMessage()).isEqualTo("이미 존재하는 회원");
 
         //then
     }
 
-    @Test
-    void findMembers() {
-    }
-
-    @Test
-    void findOne() {
-    }
 }
